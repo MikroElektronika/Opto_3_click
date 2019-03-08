@@ -1,0 +1,73 @@
+{
+Example for Opto_3 Click
+
+    Date          : Nov 2018.
+    Author        : Nemanja Medakovic
+
+Test configuration KINETIS :
+    
+    MCU              : MK64
+    Dev. Board       : HEXIWEAR
+    ARM Compiler ver : v6.0.0.0
+
+---
+
+Description :
+
+The application is composed of three sections :
+
+- System Initialization - Initializes peripherals and pins.
+- Application Initialization - Initializes GPIO interface.
+- Application Task - (code snippet) - Switches ON or switches OFF the both outputs depending on the
+  states of the inputs, respectively.
+Note : Input state is active low, and output state is active high.
+
+}
+program Click_Opto_3_KINETIS;
+
+uses Click_Opto_3_types, Click_Opto_3_config;
+
+var
+    stateIN1 : T_OPTO3_STATE; 
+    stateIN2 : T_OPTO3_STATE; 
+    stateOUT1 : T_OPTO3_SWITCH; 
+    stateOUT2 : T_OPTO3_SWITCH; 
+    
+procedure systemInit(); 
+begin
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_PWM_PIN, _GPIO_INPUT); 
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_INT_PIN, _GPIO_INPUT); 
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_AN_PIN, _GPIO_OUTPUT); 
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_RST_PIN, _GPIO_OUTPUT); 
+    mikrobus_logInit(_MIKROBUS2, 9600); 
+    mikrobus_logWrite('*** Initializing... ***', _LOG_LINE); 
+    Delay_ms(100); 
+end;
+
+procedure applicationInit(); 
+begin
+    opto3_gpioDriverInit(T_OPTO3_P(@_MIKROBUS1_GPIO)); 
+    Delay_ms(100); 
+    mikrobus_logWrite('** Opto 3 is initialized **', _LOG_LINE); 
+    mikrobus_logWrite('', _LOG_LINE); 
+end;
+
+procedure applicationTask(); 
+begin
+    stateIN1 := opto3_getIN1(); 
+    stateIN2 := opto3_getIN2(); 
+    stateOUT1 := stateIN1 xor 1; 
+    stateOUT2 := stateIN2 xor 1; 
+    opto3_setOUT1(stateOUT1); 
+    opto3_setOUT2(stateOUT2); 
+end;
+
+begin
+
+    systemInit(); 
+    applicationInit(); 
+    while (1) do 
+    begin 
+        applicationTask(); 
+    end;
+end.

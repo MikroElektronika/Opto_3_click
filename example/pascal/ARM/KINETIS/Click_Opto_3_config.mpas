@@ -1,0 +1,5 @@
+unit Click_Opto_3_config;
+
+uses Click_Opto_3_types;
+
+end.

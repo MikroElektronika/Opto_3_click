@@ -1,0 +1,4 @@
+module Click_Opto_3_config
+
+include Click_Opto_3_types
+end.
